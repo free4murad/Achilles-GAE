@@ -1,0 +1,43 @@
+<div ng-controller="StudentDetailCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="messages" class="alert alert-{{alertStatus}}" ng-show="messages">
+                <span ng-bind="messages"></span>
+                <i class="dismiss-messages pull-right glyphicon glyphicon-remove" ng-click="messages = ''"
+                   ng-show="messages"></i>
+            </div>
+            <img class="spinner" src="/img/ajax-loader.gif" ng-show="loading"/>
+        </div>
+    </div>
+
+    <div class="row" ng-init="init()">
+        <div class="col-md-9">
+            <div class="well well-sm">
+                <h2>{{student.name}}</h2>
+                <h5>{{student.grade}}</h5>
+                <h5>{{student.school}}</h5>
+                <h5>{{student.miles_completed}}</h5>
+                <div>
+                   
+
+            <form class="form" novalidate role="form">
+                <fieldset>
+                    <div>
+                        <label for="city">Grade: </label>
+                        <span id="city">{{student.grade}}</span>
+                    </div>
+                    <div>
+                        <label for="topics">School: </label>
+                        <span id="topics">
+                            <span ng-repeat="school in student.school" class="label label-primary label-separated">{{school}}</span>
+                        </span>
+                    </div>
+                    <div>
+                        <label for="startDate">Miles completed: </label>
+                        <span id="startDate">{{student.miles_completed}}</span>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
