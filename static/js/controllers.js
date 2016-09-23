@@ -101,6 +101,58 @@ achillesKidsApp.controllers.controller('MyProfileCtrl',
         };
     });
 
+/**
+ * @ngdoc controller
+ * @name CreateStudentCtrl
+ *
+ * @description
+ * A controller used for the Create student profiles page.
+ */
+ achillesKidsApp.controllers.controller('CreateStudentCtrl',
+    function ($scope, $log, oauth2Provider, HTTP_ERRORS) {
+
+            /**
+         * The student object being edited in the page.
+         * @type {{}|*}
+         */
+        $scope.student = $scope.student || {};
+
+  /**
+         * Invokes the student.createStudent API.
+         *
+         * @param studentForm the form object.
+         */
+        $scope.createStudent = function (studentForm) {
+
+            $scope.loading = true;
+            gapi.client.achilles.createStudent($scope.student).execute(function (resp) {
+                $scope.$apply(function () {
+                        $scope.loading = false;
+                        if (resp.error) {
+                            // The request has failed.
+                            var errorMessage = resp.error.message || '';
+                            $scope.messages = 'Failed to create a student profile : ' + errorMessage;
+                            $scope.alertStatus = 'warning';
+                            $log.error($scope.messages + ' Student : ' + JSON.stringify($scope.student));
+
+                            if (resp.code && resp.code == HTTP_ERRORS.UNAUTHORIZED) {
+                                oauth2Provider.showLoginModal();
+                                return;
+                            }
+                        } else {
+                            // The request has succeeded.
+                            $scope.messages = 'The student profile has been created : ' + resp.result.name;
+                            $scope.alertStatus = 'success';
+                            $scope.submitted = false;
+                            $scope.student = {};
+                            $log.info($scope.messages + ' : ' + JSON.stringify(resp.result));
+                        }
+                    });
+                });
+        };
+    });
+
+
 /* The root controller having a scope of the body element and methods used in the application wide
  * such as user authentications.
  *
@@ -387,7 +439,7 @@ achillesKidsApp.controllers.controller('ShowStudentCtrl', function ($scope, $log
             }
         }
         $scope.loading = true;
-        gapi.client.student.queryStudents(sendFilters).
+        gapi.client.achilles.queryStudents(sendFilters).
             execute(function (resp) {
                 $scope.$apply(function () {
                     $scope.loading = false;
@@ -427,7 +479,7 @@ achillesKidsApp.controllers.controller('StudentDetailCtrl', function ($scope, $l
      */
     $scope.init = function () {
         $scope.loading = true;
-        gapi.client.student.getStudent({
+        gapi.client.achilles.getStudent({
             websafeStudentKey: $routeParams.websafeStudentKey
         }).execute(function (resp) {
             $scope.$apply(function () {

@@ -1,0 +1,53 @@
+<div ng-controller="CreateStudentCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="messages" class="alert alert-{{alertStatus}}" ng-show="messages">
+                <span ng-bind="messages"></span>
+                <i class="dismiss-messages pull-right glyphicon glyphicon-remove" ng-click="messages = ''"
+                   ng-show="messages"></i>
+            </div>
+            <img class="spinner" src="/img/ajax-loader.gif" ng-show="loading"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Add a Student Profile</h3>
+
+            <form name="studentForm" novalidate role="form">
+                <div class="form-group">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <span class="label label-danger"
+                        ng-show="studentForm.name.$error.required">Required!</span>
+                    <input id="name" type="text" name="name" ng-model="student.name" class="form-control"
+                           ng-required="true"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">School</label>
+                    <input id="name" ng-model="student.school" name="name"  ng-model="student.school"
+                            class="form-control">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">Grade</label>
+                    <input id="name" ng-model="student.grade" name="name"  ng-model="student.grade"
+                            class="form-control">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">Miles Completed</label>
+                    <input id="name" ng-model="student.miles" name="name"  ng-model="student.miles"
+                            class="form-control">
+                    </select>
+                </div>
+
+
+                <button ng-click="createStudent(studentForm)" class="btn btn-primary"
+                        ng-disabled="loading">Create
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

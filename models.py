@@ -41,3 +41,15 @@ class TeeShirtSize(messages.Enum):
     XXL_W = 13
     XXXL_M = 14
     XXXL_W = 15
+
+class Student(ndb.Model):
+    name = ndb.StringProperty(required=True)
+    school = ndb.StringProperty()
+    grade = ndb.StringProperty()
+    miles = ndb.StringProperty()
+
+class StudentForm(messages.Message):
+    name = messages.StringField(1)
+    school = messages.StringField(2)
+    grade = messages.StringField(3)
+    miles = messages.StringField(4)

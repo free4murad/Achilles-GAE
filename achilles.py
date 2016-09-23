@@ -22,6 +22,8 @@ from models import Profile
 from models import ProfileMiniForm
 from models import ProfileForm
 from models import TeeShirtSize
+from models import Student
+from models import StudentForm
 
 from settings import WEB_CLIENT_ID
 
@@ -32,6 +34,12 @@ API_EXPLORER_CLIENT_ID = endpoints.API_EXPLORER_CLIENT_ID
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+DEFAULTS = {
+    "school": "Default School",
+    "grade": 0,
+    "miles": 0
+}
+
 
 @endpoints.api( name='achilles',
                 version='v1',
@@ -39,6 +47,64 @@ API_EXPLORER_CLIENT_ID = endpoints.API_EXPLORER_CLIENT_ID
                 scopes=[EMAIL_SCOPE])
 class AchillesApi(remote.Service):
     """Achilles API v0.1"""
+
+
+# - - - Student objects - - - - - - - - - - - - - - - - - - -
+
+    def _copyStudentToForm(self, student, displayName):
+        """Copy relevant fields from Student to StudentForm"""
+        sf = StudentForm()
+        for field in sf.all_fields():
+            if hasattr(student, field.name):
+                setattr(sf, field.name, getattr(student, field.name))
+            if field.name == "websafeKey":
+                setattr(sf, field.name, student.key.urlsafe())
+        # try without:
+        # if displayName:
+        #     setattr(sf, 'organizerDisplayName', displayName)
+        sf.check_initialized()
+        return sf
+
+    def _createStudentObject(self, request):
+        """Create or update Student object, returning StudentForm/request"""
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+        user_id = getUserId(user)
+
+        if not request.name:
+            raise endpoints.BadRequestException("Student 'name' field required")
+
+        # copy StudentForm/ProtoRPC Message into dictionary
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        del data['websafeKey']
+
+        # add default values for those missing
+        for df in DEFAULTS:
+            if data[df] in (None, []):
+                data[df] = DEFAULTS[df]
+                setattr(request, df, DEFAULTS[df])
+
+        # make Profile Key from user ID
+        p_key = ndb.Key(Profile, user_id)
+        # allocate new Student ID with Profile key as parent
+        s_id = Student.allocate_ids(size=1, parent=p_key)[0]
+        #make Student key from ID
+        s_id = ndb.Key(Student, s_id, parent=p_key)
+        data['key'] = s_key
+
+        # add Student profile and return modified StudentForm
+        Student(**data).put()
+
+        return(request)
+
+    @endpoints.method(StudentForm, StudentForm, path='student', http_method='POST', name='createStudent')
+    def createStudent(self, request):
+        """Create new student."""
+        return self._createStudentObject(request)
+
+
+
 
 # - - - Profile objects - - - - - - - - - - - - - - - - - - -
 

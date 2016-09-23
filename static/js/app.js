@@ -12,6 +12,10 @@ var app = angular.module('achillesKidsApp',
 					templateUrl: '/partials/show_students.html',
 					controller: 'ShowStudentCtrl'
 				}).
+                when('/student/create', {
+                    templateUrl: '/partials/create_students.html',
+                    controller: 'CreateStudentCtrl'
+                }).
 				when('/student/detail/:websafeStudentKey', {
 					templateUrl: '/partials/student_detail.html',
 					controller: 'StudentDetailCtrl'
